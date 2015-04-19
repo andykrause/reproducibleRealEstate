@@ -43,6 +43,6 @@ Temporary Items
 .apdisk
 
 #  Custom files to ignore
-processOverview.png
+#processOverview.png
 processOverview.graphml
 *.RData
