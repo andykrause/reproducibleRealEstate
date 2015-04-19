@@ -16,46 +16,17 @@
   library(spdep)
   library(sp)
   library(rgeos)
-  library(spgwr)
   library(spam)
-  library(colorRamps)
-  library(RColorBrewer)
-  library(ggmap)
-  library(reshape)
-  library(ggplot2)
-  library(gridExtra)
 
  ## Set location parameter
 
-  #locDir <- 'c:/dropbox/dropbox/' 
   codePath <- 'D:/Code/R/Research/RRR'
   dataPath <- 'D:/Data/Research/RRR' 
-  #exportPlots <- FALSE
 
  ## Source Files
   
   source(file.path(codePath, 'spatEconTools.R'))
  
- ## Define helper functions
-
-  # Extract pseudo R-squared
-  pseudoR2 <- function(mod)
-  {
-    if(class(mod) == 'sarlm') Y <- mod$y
-    if(class(mod) == 'lm') Y <- mod$model[ ,1]
-    
-    ybar <- sum((Y - mean(Y)) ^ 2)
-    yhat <- sum((Y - mod$fitted.values) ^ 2)
-    return(1 - (yhat / ybar))
-  }
-
-  # Build a summary statistics table for export
-  buildSSTable <- function(ssData){
-    ssData <- ssData[, apply(ssData, 2, class) == 'numeric']
-    SS <- t(apply(ssData, 2, summary))
-    return(SS)
-  }
-
 ### Load in Data -------------------------------------------------------------------------
   
  ##  Load in Prepared sales data
@@ -178,7 +149,7 @@
   modSEM <- errorsarlm(as.formula(modBase), data=salesSP@data, swmAll10, method="spam", 
                        zero.policy=TRUE)
 
-  pseudoR2(modSEM)
+  calcPseudoR2(modSEM)
 
 ### Add differntation based on view score
 
@@ -196,4 +167,4 @@
   modSEMSc <- errorsarlm(as.formula(modBaseSc), data=salesSP@data, swmAll10,
                          method="spam", zero.policy=TRUE)
  
-  pseudoR2(modSEMSc)
+  calcPseudoR2(modSEMSc)
