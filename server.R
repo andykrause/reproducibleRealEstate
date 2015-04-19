@@ -1,6 +1,6 @@
 ################################################################################
 #                                                                              #
-#   Server for Zestimate MD Shiny App.                                         #
+#   Server for Reproducible Real Estate Analysis                               #
 #                                                                              #  
 ################################################################################
 
@@ -8,13 +8,17 @@
 
 library(shiny)
 library(xtable)
+library(sp)
+library(spdep)
+library(maptools)
 
 load('RRR.RData')
+source('spatEconTools.R')
 
 shinyServer(function(input, output) {
 
   
-### Reactive function to call ZestimateMD function ----------------------------------------------------  
+### Reactive function to call UpdateData function ----------------------------------------  
  
   updateData <- reactive({
    
@@ -119,65 +123,68 @@ shinyServer(function(input, output) {
                 namesRows=namesRows))
   })
 
-###  Estimate OLS Model ------------------------------------------------------------------------
+###  Estimate Model ------------------------------------------------------------------------
 
-  estimateOLSModel <- reactive({
+  estimateModel <- eventReactive(input$rerun, {
     res <- updateData()
     modSpec <- buildModSpec()
-    modBase <- lm(modSpec$modSpec, data=res)
-    modBase    
+    
+    if(input$spatEcon){
+#       swm <- buildSWM()
+#       modObj <- errorsarlm(as.formula(modSpec$modSpec), data=res, listw=swm, method='spam',
+#                            zero.policy=TRUE)
+    } else {
+      modObj <- lm(modSpec$modSpec, data=res)
+    }
+    
+    modObj
   })
 
+###  Build SWM OLS Model ------------------------------------------------------------------------
 
-### Basic Information Table -----------------------------------------------------------
+#   buildSWM <- eventReactive(input$rerun, {
+#     dataSP <- SpatialPointsDataFrame(coords=cbind(updateData()$X,
+#                                                   updateData()$Y),
+#                                      data = updateData())
+#     swmX <- createSWM(dataSP, knn=input$swmKnn, distWeighted=input$swmType, nugget=25)
+#     swmX                                              
+#   })
 
-#     output$infoTable <- renderTable({
-#       res <- updateData()
-#       infoTable <- data.frame(
-#            Zpid = res$property$PropertyID,
-#            UseCode = res$property$UsecodeTypeIDStandard,
-#            FinishedSquareFeet = res$property$FinishedSquareFeet,
-#            Bedrooms = res$property$BedroomCnt,
-#            Bathrooms = res$property$BathroomCnt,
-#            YearBuilt = res$property$BuiltYear,
-#            MajorRemodelYear = res$property$MajorRemodelYear,
-#            LotSizeSquareFeet = res$property$LotSizeSquareFeet,
-#            GrossAssessement = res$property$AssessedGrossValueDollarCnt,
-#            MarketAssessement = res$property$MarketValueDollarCnt,
-#            Waterfront = res$property$IsWaterfront,
-#            SLR = res$property$IsSLR
-#       )
-#       resX <- data.frame(t(infoTable))
-#       colnames(resX) <- "Value"
-#       resX$Value <- round(resX$Value, 0)
-#       xtable(resX, digits=0)
-#     })
-#  
-#  ### Table of Valuation Information ------------------------------------------------------------
-# 
-    output$valTable <- renderTable({
-      rNames <- buildModSpec()$namesRows
-      modRes <- try(estimateOLSModel(), silent=T)
-      if(class(modRes) == 'try-error'){
-        xtable(data.frame(
-          message="You have filtered out too many sales, include more sales and try again"))
-      } else {
+### Table of Valuation Information ------------------------------------------------------------
+
+  createCoefTable <- eventReactive(input$rerun, {
+    rNames <- buildModSpec()$namesRows
+    modRes <- try(estimateModel(), silent=T)
+    if(class(modRes) == 'try-error'){
+      xtable(data.frame(
+        message="You have filtered out too many sales, include more sales and try again"))
+    } else {
+      #if(input$spatEcon){
         valTable <- summary(modRes)[[4]]
-        errorCheck <- try(rownames(valTable) <- c('Constant', rNames), silent=T)
-        if(class(errorCheck) == 'try-error'){
-          xtable(data.frame(
-            message="You have filtered out too many sales, include more sales and try again"))    
-        } else {
-          xtable(valTable, digits=3)      
-        }
+      #} else {
+      #  valTable <- summary(modRes)[[4]][,1]        
+      #}
+      
+      errorCheck <- try(rownames(valTable) <- c('Constant', rNames), silent=T)
+      if(class(errorCheck) == 'try-error'){
+        xtable(data.frame(
+          message="You have filtered out too many sales, include more sales and try again"))    
+      } else {
+        xtable(valTable, digits=4)      
       }
-   })
-# #   
-# # ### Plot of Valuations over time Information ------------------------------------------------------------
-#  
+    }   
+  })
+
+### Output value table -------------------------------------------------------------------
+
+  output$valTable <- renderTable({  
+    createCoefTable()
+  })
+ 
+### Plot View Coefficients    ------------------------------------------------------------
 
   output$valPlot2 <- renderPlot({
-    coefs <- estimateOLSModel()
+    coefs <- estimateModel()
       par(mar=c(12.1,4.1,4.1,2.1))
       sel <- grep('view', names(coefs$coefficients))
       vNames <- buildModSpec()$namesRows[sel-1]
@@ -187,14 +194,9 @@ shinyServer(function(input, output) {
       barplot(100*(exp(coefs$coef[sel])-1),
               names.arg=vNames, las=3, col=vCol, border=vCol,
               ylab="% Premium")
-#     } else {
-#       sel <- grep('view', names(coefs$coefficients))
-#       vNames <- buildModSpec()$namesRows[sel-1]
-#       
-#       
-#       barplot(coefs$coef[sel])
-#     }  
    })
+
+### Plot Data Map ------------------------------------------------------------------------
 
   output$mapP <- renderPlot({
     res <- updateData()
@@ -204,79 +206,13 @@ shinyServer(function(input, output) {
   })
 
 
-#  
-# # ### Comp Map --------------------------------------------------------------------------------------------
-# # 
-#    output$mapPlot <- renderPlot({
-#       res <- updateData()
-#       rgmPlot(data = list(res$taeReport$Comps, res$zaeReport$Comps, res$property),
-#               cols = list(4,3,2),
-#               cexs = list(1,1,1.5),
-#               pchs = list(17,18,15))
-#     }, height=500, width=600)
-# 
-# # ## Knn Plots -------------------------------------------------------------------------------------------
-# # 
-# #   output$knnPlot <- renderPlot({
-# #     res <- updateData()
-# # 
-# #     plot(0,0,col=0,xlim=c(-.5,2.5), ylim=c(-.2,1.2),xlab="KNN Measure",ylab="Relative Value",
-# #        xaxt='n')
-# #     axis(1, at=0:2, labels=c("Zest","Zest/SqFt","Zest/LotSqFt"))
-# #     zpS <- c(res$property$ZestPrior, res$property$ZestPriorSmooth15, res$property$ZestPriorSmooth50)
-# #     zpS <- (zpS - min(zpS)) / max(zpS)
-# #     zpFS <- c(res$property$ZestPriorSqft, res$property$ZestPriorSqftSmooth15, res$property$ZestPriorSqftSmooth50)
-# #     zpFS <- (zpFS - min(zpFS)) / max(zpFS)
-# #     zpLS <- c(res$property$ZestPriorLotSizeSqft, res$property$ZestPriorLotSizeSqftSmooth15, 
-# #             res$property$ZestPriorLotSizeSqftSmooth50)
-# #     zpLS <- (zpLS - min(zpLS)) / max(zpLS)
-# #   
-# #     lines(c(0:2),c(zpS[1],zpFS[1],zpLS[1]),lwd=3,col=2)
-# #     lines(c(0:2),c(zpS[2],zpFS[2],zpLS[2]),lwd=3,col=4)
-# #     lines(c(0:2),c(zpS[3],zpFS[3],zpLS[3]),lwd=3,col=5)
-# #     legend('topleft', c("Subject","KNN15","KNN50"),lwd=2,col=c(2,4,5))
-# #   })
-# # 
-# # ### AppEmu Trans Comp Information           ------------------------------------------------------------
-# # 
-# output$taeTable <- renderTable({
-#   res <- updateData()
-#   taeTable <- data.frame(
-#     CompNbr = c("Subject",paste0("Comp",1:nrow(res$predAET$comps))),
-#     HomeSqFt = c(res$property$FinishedSquareFeet, res$predAET$comps$FinishedSquareFeet),
-#     Baths = c(res$property$BathroomCnt, res$predAET$comps$BathroomCnt),
-#     Beds = c(res$property$BedroomCnt, res$predAET$comps$BedroomCnt),
-#     YrBuilt = c(res$property$BuiltYear, res$predAET$comps$BuiltYear),
-#     LotSize = c(res$property$LotSizeSquareFeet, res$predAET$comps$LotSizeSquareFeet),
-#     AssdVal = c(res$property$AssessedGrossValueDollarCnt, res$predAET$comps$AssessedGrossValueDollarCnt),
-#     OrigEst = c(0, res$predAET$adjs$origEst),
-#     AdjAmt = c(0, res$predAET$adjs$adjAmt),
-#     AdjEst = c(0, res$predAET$adjs$adjEst),
-#     CompWgt = c(0, res$predAET$adjs$wt)    
-#   )
-#   xtable(taeTable, digits=0, size='tiny')
-# })
-# # 
-# # ### AppEmu Zest Comp Information           ------------------------------------------------------------
-# # 
-# output$zaeTable <- renderTable({
-#   res <- updateData()
-#   zaeTable <- data.frame(
-#     CompNbr = c("Subject",paste0("Comp",1:nrow(res$predAEZ$comps))),
-#     HomeSqFt = c(res$property$FinishedSquareFeet, res$predAEZ$comps$FinishedSquareFeet),
-#     Baths = c(res$property$BathroomCnt, res$predAEZ$comps$BathroomCnt),
-#     Beds = c(res$property$BedroomCnt, res$predAEZ$comps$BedroomCnt),
-#     YrBuilt = c(res$property$BuiltYear, res$predAEZ$comps$BuiltYear),
-#     LotSize = c(res$property$LotSizeSquareFeet, res$predAEZ$comps$LotSizeSquareFeet),
-#     AssdVal = c(res$property$AssessedGrossValueDollarCnt, res$predAEZ$comps$AssessedGrossValueDollarCnt),
-#     OrigEst = c(0, res$predAEZ$adjs$origEst),
-#     AdjAmt = c(0, res$predAEZ$adjs$adjAmt),
-#     AdjEst = c(0, res$predAEZ$adjs$adjEst),
-#     CompWgt = c(0, res$predAEZ$adjs$wt)    
-#   )
-#   xtable(zaeTable, digits=0, size='tiny')
-# })
-# 
+### Plot Data Map ------------------------------------------------------------------------
+
+output$diags <- renderPlot({
+ coefs <- estimateModel()
+ par(mfrow=c(2,2))
+ plot(coefs)
+})
 
 
 })
