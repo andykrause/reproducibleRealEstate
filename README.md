@@ -12,7 +12,7 @@ This document explains the process for reproducing the data and analysis describ
 2. Download all code files from this repository at: [http://www.github.com/AnonREAuthor/ReproducibleRealEstate](http://www.github.com/AnonREAuthor/ReproducibleRealEstate "Git")
 3.  Execute the code using R version 3.1.1 (R Core Team 2015), as decribed below. 
 
-Each step in explained below, including a 'chunk'-by-'chunk' explanation (literate programming) of the code used to prepare and analyze the data.
+Each step in explained below, including a 'chunk'-by-'chunk' explanation (literate programming) of the code used to prepare and analyze the data.  
 
 ### Downloading Data Files
 
@@ -32,6 +32,8 @@ The code necessary to reproduce this analysis is located at [http://www.github.c
 6. spatEconTools.R: A set of helper functions for working with spatial econometric models.
 
 The downloaded code can be saved in the same directory as the data or in a separate directory.  The user will have the option of specifying separate data and code directories in the analysis the follows.
+
+NOTE:  User wishing to avoid the lengthy data preparation stage of the analysis can skip directly to the data analysis by using the **cleansales.csv** file and the **dataAnalysisCode.R**.   
 
 ### Data Preparation and Analysis
 
