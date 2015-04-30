@@ -20,7 +20,7 @@ shinyUI(fluidPage(
   sidebarLayout(
     sidebarPanel(
       # Recalculate Button
-      actionButton('rerun', "Calculate Model"),
+      actionButton('rerun', "Calculate/Recalculate Model"),
       
       # Select Input Type
       selectInput(
@@ -33,7 +33,7 @@ shinyUI(fluidPage(
       conditionalPanel(
         condition = "input.inputType == 'dataf'",
         
-        h3("Data Filters"),
+        h4("Data Filters"),
       
         sliderInput("priceLimits", "Price Range",
                     min = 50000, max = 5000000, 
@@ -52,7 +52,7 @@ shinyUI(fluidPage(
       # Conditiona Model Variables
       conditionalPanel(
         condition = "input.inputType == 'mvar'",
-        h3("Model Variables"),
+        h4("Model Variables"),
       
         h6("Variables of Interest"),
         checkboxInput("viewMount", label = "Mountain View", value = TRUE),
@@ -76,7 +76,7 @@ shinyUI(fluidPage(
       # Conditiona Model Specifications
       conditionalPanel(
         condition = "input.inputType == 'spect'",
-        h3("Model Specification"),
+        h4("Model Specification"),
         
         h5("Spatial Modeling (Can be slow!)"),
         checkboxInput("spatEcon", label = "Use Spatial Error Model", value = FALSE),
@@ -86,23 +86,21 @@ shinyUI(fluidPage(
         sliderInput("swmKnn", "# of Nearest Neighbors",
                     min = 1, max = 25, 
                     value = 10,step=1),
-        # Build SWM Button
-        actionButton('buildswm', "Build spatial weights matrix")
+        p(strong(div("WARNING: Calculation of spatial error model may take a few minutes.
+          Existing output will become slightly transparent while calculations
+          are being made.", style = "color:red")))
+        
       )
     ),
     
   # Show the caption and plot of the requested variable against mpg
   mainPanel(
    tabsetPanel(
-    tabPanel("Model Coefficients", tableOutput("valTable")),
-    tabPanel("Map", plotOutput("mapP")),
+     tabPanel("Sales Map", plotOutput("mapP")),
+    tabPanel("Model Coefficients", div(tableOutput("valTable"), style="font-size:70%")),
     tabPanel("View Premiums", plotOutput("valPlot2")),
-    tabPanel("Diagnostics", plotOutput("diags"))
-    
-    
-     #,tabPanel("Comp Map", plotOutput("mapPlot"))
-     #,tabPanel("AETrans Comps",div(tableOutput("taeTable"),style='font-size:80%'))
-     #,tabPanel("AEZest Comps",div(tableOutput("zaeTable"),style='font-size:80%'))
+    tabPanel("Residuals Map", plotOutput("resPlot")),
+    tabPanel("Diagnostics", tableOutput("diagTable"))#,
    )
   )
  )
