@@ -63,22 +63,22 @@ img {
 
 <div id="reproducible-research-in-real-estate" class="section level1">
 <h1>Reproducible Research in Real Estate</h1>
-<p>This repository contains the necessary code to reproduce the analysis of King County sales data as referenced in the article entitled “Reproducibiliy in Real Estate: Panacaea or Pipe Dream”, by Anonymous Real Estate Author (anonymous for peer review effects).</p>
+<p>This repository contains the necessary code to reproduce the analysis of King County sales data as referenced in the article entitled “Reproducibiliy in Real Estate: A Review and an Example”, by Anonymous Real Estate Author (anonymous for peer review effects).</p>
 <div id="documentation" class="section level2">
 <h2>Documentation</h2>
 <div id="introduction" class="section level3">
 <h3>Introduction</h3>
-<p>This document explains the process for reproducing the data and analysis described in the paper entitled ``Reproducible Research in Real Estate: XXXX’’. There are three key steps in reproducing the data and analysis:</p>
+<p>This document explains the process for reproducing the data and analysis described in the paper entitled ``Reproducible Research in Real Estate: A Review and an Example’’. There are three key steps in reproducing the data and analysis:</p>
 <ol style="list-style-type: decimal">
-<li>Download all raw data files according to the instruction below from the www.dataverge.org hosted site. <a href="http://dx.doi.org/10.7910/DVN/29642" title="DOI"><a href="http://dx.doi.org/10.7910/DVN/29642">http://dx.doi.org/10.7910/DVN/29642</a></a></li>
-<li>Download all code files from this repository at: <a href="http://www.github.com/AnonREAuthor/ReproducibleRealEstate" title="Git"><a href="http://www.github.com//AnonREAuthor">http://www.github.com//AnonREAuthor</a></a></li>
+<li>Download all raw data files according to the instruction below from the www.dataverge.org hosted site. <a href="http://dx.doi.org/10.7910/DVN/RHJCNC" title="DOI"><a href="http://dx.doi.org/10.7910/DVN/RHJCNC">http://dx.doi.org/10.7910/DVN/RHJCNC</a></a></li>
+<li>Download all code files from this repository at: <a href="http://www.github.com/AnonREAuthor/ReproducibleRealEstate" title="Git"><a href="http://www.github.com/AnonREAuthor/ReproducibleRealEstate">http://www.github.com/AnonREAuthor/ReproducibleRealEstate</a></a></li>
 <li>Execute the code using R version 3.1.1 (R Core Team 2015), as decribed below.</li>
 </ol>
 <p>Each step in explained below, including a ‘chunk’-by-‘chunk’ explanation (literate programming) of the code used to prepare and analyze the data.</p>
 </div>
 <div id="downloading-data-files" class="section level3">
 <h3>Downloading Data Files</h3>
-<p>The data files used in this analysis are hosted on the Harvard Dataverse Network and can be accessed online at <a href="http://dx.doi.org/10.7910/DVN/29642" title="DOI"><a href="http://dx.doi.org/10.7910/DVN/29642">http://dx.doi.org/10.7910/DVN/29642</a></a>. Navigate to the ‘DATA &amp; ANALYSIS’ tab and download all files in the ‘Raw Assessor Data’ and ‘Raw GIS Data’ sections. Save the files to a suitable working directory. This working directory will be used in the data preparation and analysis code that follows. Users without a current Dataverse account will need to create a free account in order to access the data.</p>
+<p>The data files used in this analysis are hosted on the Harvard Dataverse Network and can be accessed online at <a href="http://dx.doi.org/10.7910/DVN/RHJCNC" title="DOI"><a href="http://dx.doi.org/10.7910/DVN/RHJCNC">http://dx.doi.org/10.7910/DVN/RHJCNC</a></a>. Navigate to the ‘DATA &amp; ANALYSIS’ tab and download all files in the ‘Raw Assessor Data’ and ‘Raw GIS Data’ sections. Save the files to a suitable working directory. This working directory will be used in the data preparation and analysis code that follows. Users without a current Dataverse account will need to create a free account in order to access the data.</p>
 <p>The raw files are also available at <a href="http://info.kingcounty.gov/assessor/DataDownload/default.aspx" title="Assessor"><a href="http://info.kingcounty.gov/assessor/DataDownload/default.aspx">http://info.kingcounty.gov/assessor/DataDownload/default.aspx</a></a> and <a href="http://www5.kingcounty.gov/gisdataportal/Default.aspx" title="GIS"><a href="http://www5.kingcounty.gov/gisdataportal/Default.aspx">http://www5.kingcounty.gov/gisdataportal/Default.aspx</a></a>. As these files are updated weekly, downloading the latest data and running the code that follows on it will produce slightly different results due to changes in the assessor’s data since January 5th, 2015 (the first weekly update that contained the 2014 year end data), the date of the archived data that is available on Dataverse.</p>
 </div>
 <div id="downloading-code" class="section level3">
@@ -346,7 +346,6 @@ sqrt(modSEMSc$s2)
 
 AIC(modBaseSc)
 AIC(modSEMSc)</code></pre>
-<p>xxxx</p>
 </div>
 </div>
 </div>
