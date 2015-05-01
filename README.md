@@ -1,6 +1,6 @@
 # Reproducible Research in Real Estate
 
-This repository contains the necessary code to reproduce the analysis of King County sales data as referenced in the article entitled "Reproducibiliy in Real Estate:  A Review and an Example", by Anonymous Real Estate Author (anonymous for peer review effects).
+This repository contains the necessary code to reproduce the analysis of King County sales data as referenced in the article entitled "Reproducible Research in Real Estate:  A Review and an Example", by Anonymous Real Estate Author (anonymous for peer review effects).
 
 ## Documentation
 
@@ -12,7 +12,7 @@ This document explains the process for reproducing the data and analysis describ
 2. Download all code files from this repository at: [http://www.github.com/AnonREAuthor/ReproducibleRealEstate](http://www.github.com/AnonREAuthor/ReproducibleRealEstate "Git")
 3.  Execute the code using R version 3.1.1 (R Core Team 2015), as decribed below. 
 
-Each step in explained below, including a 'chunk'-by-'chunk' explanation (literate programming) of the code used to prepare and analyze the data.  
+Each step in explained below, including a 'chunk'-by-'chunk' explanation (literate programming) of the code used to prepare and analyze the data. The **processOverview.png** file shows a schematic of the data, operations and results of this analysis.   
 
 ### Downloading Data Files
 
