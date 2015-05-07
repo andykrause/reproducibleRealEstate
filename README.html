@@ -307,7 +307,9 @@ kcSales$viewTotalScore &lt;- rowSums(kcSales[,which(names(kcSales) == 'MtRainier
 <div id="model-estimation" class="section level4">
 <h4>Model Estimation</h4>
 <p>We begin by developing a regression model using the trimmed set of sales observations. The model is specified in a semi-log format in which the natural log of the sales price is the dependent variable.</p>
-<p>modBase &lt;- lm(log(SalePrice) ~ as.factor(Month) + lotAcres + WFNT + BldgGrade + homeSize + Baths + Age + Fireplaces + Townhome + viewMount + viewWater + viewOther, data=trimSales)</p>
+<pre><code>modBase &lt;- lm(log(SalePrice) ~ as.factor(Month) + lotAcres + WFNT + BldgGrade + 
+              homeSize + Baths + Age + Fireplaces + Townhome + 
+              viewMount + viewWater + viewOther, data=trimSales)</code></pre>
 <p>We then test for spatial autocorrelation in the residuals of the model To do so, we first construct a spatial point data frame using the <code>SpatialPointsDataFrame()</code> function from the <strong>sp</strong> package.</p>
 <pre><code>salesSP &lt;- SpatialPointsDataFrame(coords=cbind(trimSales$X, trimSales$Y),
                                    data=trimSales)

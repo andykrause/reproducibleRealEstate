@@ -341,7 +341,7 @@ After the three filtering activities, 19,987 observations remain.
 
 We begin by developing a regression model using the trimmed set of sales observations.  The model is specified in a semi-log format in which the natural log of the sales price is the dependent variable.
 
-  modBase <- lm(log(SalePrice) ~ as.factor(Month) + lotAcres + WFNT + BldgGrade + 
+    modBase <- lm(log(SalePrice) ~ as.factor(Month) + lotAcres + WFNT + BldgGrade + 
                   homeSize + Baths + Age + Fireplaces + Townhome + 
                   viewMount + viewWater + viewOther, data=trimSales)
 
