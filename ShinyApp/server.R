@@ -104,18 +104,15 @@ shinyServer(function(input, output) {
         namesRows <- c(namesRows, 'Other View')    
       }
     }  
-    if(input$SqFtTotLiving){
-      modSpec <- paste0(modSpec, " + SqFtTotLiving")
-      namesRows <- c(namesRows, 'Home Size (SqFt)')      
+    if(input$homeSize){
+      modSpec <- paste0(modSpec, " + homeSize")
+      namesRows <- c(namesRows, 'Home Size (1,000s SqFt)')      
     }
-    if(input$YrBuilt){
-      modSpec <- paste0(modSpec, " + YrBuilt")
-      namesRows <- c(namesRows, 'Year Built')      
+    if(input$Age){
+      modSpec <- paste0(modSpec, " + Age")
+      namesRows <- c(namesRows, 'Age of Home')      
     }
-    if(input$YrRenovated){
-      modSpec <- paste0(modSpec, " + YrRenovated")
-      namesRows <- c(namesRows, 'Year Renovated')      
-    }
+
     if(input$Baths){
       modSpec <- paste0(modSpec, " + Baths")
       namesRows <- c(namesRows, 'Bathrooms')      
@@ -134,11 +131,11 @@ shinyServer(function(input, output) {
          namesRows <- c(namesRows, 'Townhome')
       }   
     }
-    if(input$SqFtLot){
-      modSpec <- paste0(modSpec, " + SqFtLot")
-      namesRows <- c(namesRows, 'Lot Size (SqFt)')      
+    if(input$lotAcres){
+      modSpec <- paste0(modSpec, " + lotAcres")
+      namesRows <- c(namesRows, 'Lot Size (Acres)')      
     }
-    if(input$WFNT){  modSpec <- paste0(modSpec, " + WFNT")
+    if(input$WFNT){
       modSpec <- paste0(modSpec, " + WFNT")
       namesRows <- c(namesRows, 'Water Frontage')      
     }
@@ -281,14 +278,15 @@ output$diagTable <- renderTable({
     xCol <- rep(4, length(modOut$residuals))
     xCol[over] <- 2
     
+    
     resPer <- abs(modOut$residuals)
     resPer[resPer>1] <- 1
 
     xCol <- setAlpha(xCol, resPer)
-    
+
     plot(res$X, res$Y, cex=.1, col=xCol, xaxt='n', yaxt='n',
        xlab="", ylab="", main='Plot of Residuals')
-    legend('bottomright', c('Over Predict', 'Under Predict', 'Dark=higher error'),
+    legend('bottomright', c('Over Predict', 'Under Predict', 'Darker = Higher Error'),
            col=c(2,4,0), pch=16)  
  
 })

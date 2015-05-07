@@ -27,7 +27,7 @@ shinyUI(fluidPage(
         "inputType", "Select Items to Modify",
         c('Data Filters' = 'dataf',
           'Model Variables' = 'mvar',
-          'SpecificationTypes' = 'spect')),
+          'Spatial Model Options' = 'spect')),
       
       # Condition Data Filters panel
       conditionalPanel(
@@ -61,14 +61,13 @@ shinyUI(fluidPage(
         checkboxInput("byScore", label = "Use View Scores?", value = FALSE),
       
         h6("Control Variables"),
-        checkboxInput("SqFtTotLiving", label = "Home Size", value = TRUE),
-        checkboxInput("YrBuilt", label = "Year Built", value = TRUE),
-        checkboxInput("YrRenovated", label = "Year Renovated", value = TRUE),
+        checkboxInput("homeSize", label = "Home Size (1,000s SqFt)", value = TRUE),
+        checkboxInput("Age", label = "Age of Home", value = TRUE),
         checkboxInput("Baths", label = "Baths", value = TRUE),
         checkboxInput("BldgGrade", label = "Building Quality", value = TRUE),
         checkboxInput("Fireplaces", label = "# of Fireplaces", value = TRUE),
         checkboxInput("Townhome", label = "Is a Townhome?", value = TRUE),
-        checkboxInput("SqFtLot", label = "SqFtLot", value = TRUE),
+        checkboxInput("lotAcres", label = "Lot Size (acres)", value = TRUE),
         checkboxInput("WFNT", label = "Water frontage", value = TRUE),
         checkboxInput("Month", label = "Month", value = TRUE)
       ),
@@ -76,16 +75,14 @@ shinyUI(fluidPage(
       # Conditiona Model Specifications
       conditionalPanel(
         condition = "input.inputType == 'spect'",
-        h4("Model Specification"),
-        
-        h5("Spatial Modeling (Can be slow!)"),
+        h4("Spatial Modeling"),
         checkboxInput("spatEcon", label = "Use Spatial Error Model", value = FALSE),
   
-        h5("Describe Spatial Weights Matrix"),
-        checkboxInput("swmType", label = "Distance Weighted?", value = TRUE),
+        h4("Describe Spatial Weights Matrix"),
         sliderInput("swmKnn", "# of Nearest Neighbors",
                     min = 1, max = 25, 
                     value = 10,step=1),
+        checkboxInput("swmType", label = "Distance Weighted?", value = TRUE),
         p(strong(div("WARNING: Calculation of spatial error model may take a few minutes.
           Existing output will become slightly transparent while calculations
           are being made.", style = "color:red")))
