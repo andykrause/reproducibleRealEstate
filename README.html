@@ -258,6 +258,10 @@ kngBuildAssdVal(avYears=studyYear + 1,
                      </code></pre>
 <p>Next, we create a binary variable indicating whether or not the home is a townhome.</p>
 <pre><code>kcSales$Townhome &lt;- ifelse(kcSales$PresentUse == 29, 1, 0)</code></pre>
+<p>Finally, a number new, scaled variables are created in so that resulting model coefficients are of an appropriate scale.</p>
+<pre><code>kcSales$lotAcres &lt;- kcSales$SqFtLot / 43560
+kcSales$homeSize &lt;- kcSales$SqFtTotLiving / 1000
+kcSales$Age &lt;- 2014 - kcSales$YrBuilt</code></pre>
 </div>
 <div id="variable-of-interest-view" class="section level4">
 <h4>Variable of Interest: VIEW</h4>
@@ -303,9 +307,7 @@ kcSales$viewTotalScore &lt;- rowSums(kcSales[,which(names(kcSales) == 'MtRainier
 <div id="model-estimation" class="section level4">
 <h4>Model Estimation</h4>
 <p>We begin by developing a regression model using the trimmed set of sales observations. The model is specified in a semi-log format in which the natural log of the sales price is the dependent variable.</p>
-<pre><code>modBase &lt;- lm(log(SalePrice) ~ as.factor(Month) + SqFtLot + WFNT + BldgGrade + 
-              SqFtTotLiving + Baths + YrBuilt + YrRenovated + Fireplaces + Townhome + 
-              viewMount + viewWater + viewOther, data=trimSales)</code></pre>
+<p>modBase &lt;- lm(log(SalePrice) ~ as.factor(Month) + lotAcres + WFNT + BldgGrade + homeSize + Baths + Age + Fireplaces + Townhome + viewMount + viewWater + viewOther, data=trimSales)</p>
 <p>We then test for spatial autocorrelation in the residuals of the model To do so, we first construct a spatial point data frame using the <code>SpatialPointsDataFrame()</code> function from the <strong>sp</strong> package.</p>
 <pre><code>salesSP &lt;- SpatialPointsDataFrame(coords=cbind(trimSales$X, trimSales$Y),
                                    data=trimSales)
@@ -329,12 +331,12 @@ sqrt(modSEM$s2)
 AIC(modBase)
 AIC(modSEM)</code></pre>
 <p>Finally, we also test an additional specification of the models that evaluates the impact of the different view scores levels for each of the three view types. As before, we also run a sptaial error model to correct for the spatial autocorrelation in the residuals.</p>
-<pre><code>modBaseSc &lt;- lm(log(SalePrice) ~ as.factor(Month) + SqFtLot + WFNT + BldgGrade + 
-                SqFtTotLiving + Baths +
-                YrBuilt + YrRenovated + Fireplaces + Townhome + 
-                as.factor(viewMountScore) + 
-                as.factor(viewWaterScore) + 
-                as.factor(viewOtherScore), data=trimSales)
+<pre><code>modBaseSc &lt;- lm(log(SalePrice) ~ as.factor(Month) + lotAcres + WFNT + BldgGrade + 
+              homeSize + Baths +
+              Age + Fireplaces + Townhome + 
+              as.factor(viewMountScore) + 
+              as.factor(viewWaterScore) + 
+              as.factor(viewOtherScore), data=trimSales)
 
 modSEMSc &lt;- errorsarlm(as.formula(modBaseSc), data=salesSP@data, swmAll10,
                        method=&quot;spam&quot;, zero.policy=TRUE)</code></pre>

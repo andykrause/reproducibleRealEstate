@@ -269,6 +269,12 @@ Next, we create a binary variable indicating whether or not the home is a townho
 
 
     kcSales$Townhome <- ifelse(kcSales$PresentUse == 29, 1, 0)
+    
+Finally, a number new, scaled variables are created in so that resulting model coefficients are of an appropriate scale.
+
+    kcSales$lotAcres <- kcSales$SqFtLot / 43560
+    kcSales$homeSize <- kcSales$SqFtTotLiving / 1000
+    kcSales$Age <- 2014 - kcSales$YrBuilt
 
 #### Variable of Interest: VIEW
 
@@ -335,8 +341,8 @@ After the three filtering activities, 19,987 observations remain.
 
 We begin by developing a regression model using the trimmed set of sales observations.  The model is specified in a semi-log format in which the natural log of the sales price is the dependent variable.
 
-    modBase <- lm(log(SalePrice) ~ as.factor(Month) + SqFtLot + WFNT + BldgGrade + 
-                  SqFtTotLiving + Baths + YrBuilt + YrRenovated + Fireplaces + Townhome + 
+  modBase <- lm(log(SalePrice) ~ as.factor(Month) + lotAcres + WFNT + BldgGrade + 
+                  homeSize + Baths + Age + Fireplaces + Townhome + 
                   viewMount + viewWater + viewOther, data=trimSales)
 
 We then test for spatial autocorrelation in the residuals of the model  To do so, we first construct a spatial point data frame using the `SpatialPointsDataFrame()` function from the **sp** package.
@@ -374,12 +380,12 @@ Checking the diagnostics from the spatial error model show it to have greatly im
 
 Finally, we also test an additional specification of the models that evaluates the impact of the different view scores levels for each of the three view types.  As before, we also run a sptaial error model to correct for the spatial autocorrelation in the residuals.  
 
-    modBaseSc <- lm(log(SalePrice) ~ as.factor(Month) + SqFtLot + WFNT + BldgGrade + 
-                    SqFtTotLiving + Baths +
-                    YrBuilt + YrRenovated + Fireplaces + Townhome + 
-                    as.factor(viewMountScore) + 
-                    as.factor(viewWaterScore) + 
-                    as.factor(viewOtherScore), data=trimSales)
+    modBaseSc <- lm(log(SalePrice) ~ as.factor(Month) + lotAcres + WFNT + BldgGrade + 
+                  homeSize + Baths +
+                  Age + Fireplaces + Townhome + 
+                  as.factor(viewMountScore) + 
+                  as.factor(viewWaterScore) + 
+                  as.factor(viewOtherScore), data=trimSales)
 
     modSEMSc <- errorsarlm(as.formula(modBaseSc), data=salesSP@data, swmAll10,
                            method="spam", zero.policy=TRUE)
