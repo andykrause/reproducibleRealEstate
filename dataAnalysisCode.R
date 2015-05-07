@@ -20,7 +20,7 @@
 
  ## Set location parameter
 
-  codePath <- 'D:/Code/R/Research/RRR'
+  codePath <- 'D:/Code/R/Research/ReproducibleRealEstate'
   dataPath <- 'D:/Data/Research/RRR' 
 
  ## Source Files
@@ -69,6 +69,11 @@
                          
   # Create a binary variable for townhomes
   kcSales$Townhome <- ifelse(kcSales$PresentUse == 29, 1, 0)
+
+  # Scale variables
+  kcSales$lotAcres <- kcSales$SqFtLot / 43560
+  kcSales$homeSize <- kcSales$SqFtTotLiving / 1000
+  kcSales$Age <- 2014 - kcSales$YrBuilt
 
  ## Variables of interest (Views) 
 
@@ -121,8 +126,8 @@
 
 ### Create a base model ------------------------------------------------------------------
 
-  modBase <- lm(log(SalePrice) ~ as.factor(Month) + SqFtLot + WFNT + BldgGrade + 
-                  SqFtTotLiving + Baths + YrBuilt + YrRenovated + Fireplaces + Townhome + 
+  modBase <- lm(log(SalePrice) ~ as.factor(Month) + lotAcres + WFNT + BldgGrade + 
+                  homeSize + Baths + Age + Fireplaces + Townhome + 
                   viewMount + viewWater + viewOther, data=trimSales)
 
  ## Test for spatial autocorrelation
@@ -153,9 +158,9 @@
 
 ### Add differntation based on view score
 
-  modBaseSc <- lm(log(SalePrice) ~ as.factor(Month) + SqFtLot + WFNT + BldgGrade + 
-                  SqFtTotLiving + Baths +
-                  YrBuilt + YrRenovated + Fireplaces + Townhome + 
+  modBaseSc <- lm(log(SalePrice) ~ as.factor(Month) + lotAcres + WFNT + BldgGrade + 
+                  homeSize + Baths +
+                  Age + Fireplaces + Townhome + 
                   as.factor(viewMountScore) + 
                   as.factor(viewWaterScore) + 
                   as.factor(viewOtherScore), data=trimSales)
