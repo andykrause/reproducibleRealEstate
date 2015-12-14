@@ -18,11 +18,11 @@
   library(rgeos)
   library(spam)
 
- ## Set location parameter
+ ## Set location parameter (You must update these)
 
-  codePath <- 'D:/Code/R/Research/ReproducibleRealEstate'
-  dataPath <- 'D:/Data/Research/RRR' 
-
+  codePath <- '.../reproducibleRealEstat'
+  dataPath <- '.../reproducibleRealEstate'
+  
  ## Source Files
   
   source(file.path(codePath, 'spatEconTools.R'))

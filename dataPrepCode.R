@@ -16,11 +16,11 @@
   library(maptools)
   library(plyr)
 
- ## Set directories
+ ## Set directories  (You must update these)
   
-  codePath <- 'D:/code/R/Research/RRR'
-  dataPath <- 'D:/Data/Research/RRR'
-  
+  codePath <- '.../reproducibleRealEstat'
+  dataPath <- '.../reproducibleRealEstate'
+
  ## Read in Functions and helper files  
   
   source(file.path(codePath, '/basicConversionTools.R'))
