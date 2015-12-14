@@ -1,6 +1,6 @@
 # Reproducible Research in Real Estate
 
-This repository contains the necessary code to reproduce the analysis of King County sales data as referenced in the article entitled "Reproducible Research in Real Estate:  A Review and an Example", by Anonymous Real Estate Author (anonymous for peer review effects).
+This repository contains the necessary code to reproduce the analysis of King County sales data as referenced in the article entitled "Reproducible Research in Real Estate:  A Review and an Example", by Andy Krause published in the Journal of Real Estate Practice and Education.
 
 ## Documentation
 
@@ -37,7 +37,7 @@ NOTE:  User wishing to avoid the lengthy data preparation stage of the analysis 
 
 ### Data Preparation and Analysis
 
-Two of the five code files need to be executing in R by the user.  First the data preparation code (**dataPrepCode.R**) followed by the actual analysis (**dataAnalysisCode.R**).  The data preparation code will take up to 30 minutes to run, depending on your process speed and alloted memory size.
+Two of the five code files need to be executing in R by the user.  The code was built and executed in R 3.2.2.  First the data preparation code (**dataPrepCode.R**) followed by the actual analysis (**dataAnalysisCode.R**).  The data preparation code will take up to 30 minutes to run, depending on your process speed and alloted memory size.
 
 #### Data Preparation: **dataPrepCode.R**
 
