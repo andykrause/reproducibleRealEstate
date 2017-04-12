@@ -45,7 +45,7 @@
     convertCSVtoSQLite(dataPathCurrent = dataPath,
                        dataPathNew = dataPath,
                        newFileName = 'KingData2014.db',
-                       fileNames=c('Extr_Parcel.csv', 'Extr_ResBldg.csv'),
+                       fileNames=c('EXTR_Parcel.csv', 'EXTR_ResBldg.csv'),
                        tableNames = c(paste0('Parcel', studyYear),
                                       paste0('ResBldg', studyYear2014),
                        overWrite=TRUE) 
