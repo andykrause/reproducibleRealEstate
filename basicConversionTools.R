@@ -45,7 +45,7 @@ convertMSAtoSQLite <- function(dataPathCurrent,             # Path to Access Fil
     if(verbose) cat("  Converting from MS Access file: ",
                     paste0(dataPathCurrent, '/', fileList[fL], '\n'))
     
-    slConn <- dbConnect('SQLite', 
+    slConn <- dbConnect(RSQLite::SQLite(),
                         dbname=paste0(dataPathNew, '/', 
                                       gsub('.accdb', '.db', newFileNames[fL])))
     if(verbose) cat("  Converting to SQLite file: ",
@@ -122,7 +122,7 @@ convertCSVtoSQLite <- function(dataPathCurrent,             # Path to .csv files
 
   ## Set up connections
 
-  slConn <- dbConnect('SQLite', 
+  slConn <- dbConnect(RSQLite::SQLite(),
                       dbname=paste0(dataPathNew, '/', newFileName))
   if(verbose) cat("  Converting to SQLite file: ",
                   paste0(dataPathNew, '/', newFileName), '\n')
