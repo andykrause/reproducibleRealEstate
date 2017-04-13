@@ -10,7 +10,7 @@ kngBuildAssdVal <- function(avYears,            # Years to use
   ## Set up connection to data
   
   if(verbose) cat('Reading in raw data \n')
-  assValConn <- dbConnect('SQLite', assdValDB)
+  assValConn <- dbConnect(RSQLite::SQLite(), assdValDB)
   avData <- dbGetQuery(assValConn, 
                        paste0('SELECT Major, Minor, TaxYr, ApprLandVal AS LandVal, ',
                               'ApprImpsVal AS ImpsVal FROM ValueHistory ',
