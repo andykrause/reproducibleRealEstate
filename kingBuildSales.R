@@ -86,7 +86,7 @@ kngSCleanSales <- function(saleYears = c(1997, 2014),      # Sales years to use
   
   # read in Sales File
   if(verbose) cat('Reading in raw sales\n')
-  salesConn <- dbConnect('SQLite', salesDB)
+  salesConn <- dbConnect(RSQLite::SQLite(), salesDB)
   rawSales <- dbReadTable(salesConn, 'AllSales')
   
   # base clean
@@ -159,7 +159,7 @@ kngSReadData <- function(dataYear,                         # Current year
   
   # Connect to database
   dbName <- paste0('d:/data/wa/king/assessor/king', dataYear, '.db')
-  dyConn <- dbConnect('SQLite', dbname=dbName)
+  dyConn <- dbConnect(RSQLite::SQLite(), dbname=dbName)
   if(verbose) cat ('\n Connecting to ', dbName, '\n')
   
   # Parcel Data    
@@ -252,7 +252,7 @@ kngSLabelSales <- function(saleYears=1999:2014,             # Sale years to use
   
   # Read in sales Data
   if(verbose) cat('Reading in sales data \n')
-  salesConn <- dbConnect('SQLite', salesDB)
+  salesConn <- dbConnect(RSQLite::SQLite(), salesDB)
   pSales <- dbReadTable(salesConn, 'trimmedSales')
   dbDisconnect(salesConn)
   
@@ -274,7 +274,7 @@ kngSLabelSales <- function(saleYears=1999:2014,             # Sale years to use
   
   # Write out
   if(verbose) cat('Writing out data \n')
-  salesConn <- dbConnect('SQLite', salesDB)
+  salesConn <- dbConnect(RSQLite::SQLite(), salesDB)
   tExists <- dbExistsTable(salesConn, 'labeledSales')
   
   if(overWrite & tExists) {
@@ -310,7 +310,7 @@ kngSConfirmLabels <- function(salesDB='d:/data/wa/king/assessor/kingsales.db',
   ## Read in sales data
   
   if(verbose) cat('Reading in sales data \n')
-  salesConn <- dbConnect('SQLite', salesDB)
+  salesConn <- dbConnect(RSQLite::SQLite(), salesDB)
   lSales <- dbReadTable(salesConn, 'labeledSales')
   
   ## Initial labeling
@@ -332,7 +332,7 @@ kngSConfirmLabels <- function(salesDB='d:/data/wa/king/assessor/kingsales.db',
   ## Write out
   
   if(verbose) cat('Writing out data \n')
-  salesConn <- dbConnect('SQLite', salesDB)
+  salesConn <- dbConnect(RSQLite::SQLite(), salesDB)
   tExists <- dbExistsTable(salesConn, 'recTypeSales')
   
   if(overWrite & tExists) {
@@ -369,7 +369,7 @@ kngSSplitAttachSales <- function(salesDB='d:/data/wa/king/assessor/kingsales.db'
   ## Read in sales data
   
   if(verbose) cat('Reading in sales data \n')
-  salesConn <- dbConnect('SQLite', salesDB)
+  salesConn <- dbConnect(RSQLite::SQLite(), salesDB)
   ySales <- dbReadTable(salesConn, 'recTypeSales')
   yData <- names(table(ySales$salesYear))
   
@@ -381,7 +381,7 @@ kngSSplitAttachSales <- function(salesDB='d:/data/wa/king/assessor/kingsales.db'
   if(verbose) cat('Attaching data for ', yData, ' \n')
     
    # Adding parcel data
-  yConn <- dbConnect('SQLite', 
+  yConn <- dbConnect(RSQLite::SQLite(),
                      paste0(dataDir, '/kingData', yData, '.db'))
   xParc <- dbReadTable(yConn, paste0('Parcel', yData))
   dbDisconnect(yConn)  
@@ -399,7 +399,7 @@ kngSSplitAttachSales <- function(salesDB='d:/data/wa/king/assessor/kingsales.db'
   ## Write out
   
   if(verbose) cat('Writing out data \n')
-  salesConn <- dbConnect('SQLite', salesDB)
+  salesConn <- dbConnect(RSQLite::SQLite(), salesDB)
   tExists <- dbExistsTable(salesConn, 'ResSales')
   
   if(overWrite & tExists) {
@@ -428,7 +428,7 @@ kngSAttachKingData <- function(xSales,                        # Sales data frame
                                ){
   
   # Set data location
-  yConn <- dbConnect('SQLite', paste0(dataDir, '/king', dataYear, '.db'))
+  yConn <- dbConnect(RSQLite::SQLite(), paste0(dataDir, '/king', dataYear, '.db'))
   
   # Load Resbldg data
   if(recType == 'R'){
@@ -461,14 +461,14 @@ kngSAttachAssdValues <- function(salesDB,
   ## Load in Sales
   
   if(verbose) cat('Reading in sales data \n')
-  salesConn <- dbConnect('SQLite', salesDB)
+  salesConn <- dbConnect(RSQLite::SQLite(), salesDB)
   lSales <- dbReadTable(salesConn, 'ResSales')
   dbDisconnect(salesConn)
   
   ## Load in Value History
   
   if(verbose) cat('Reading in assessed values \n')
-  assdValConn <- dbConnect('SQLite', file.path(dataDir, 'KingValueHistory.db'))
+  assdValConn <- dbConnect(RSQLite::SQLite(), file.path(dataDir, 'KingValueHistory.db'))
   assdValues <- dbReadTable(assdValConn, paste0('valuehist', dataYear))
   dbDisconnect(salesConn)
   
