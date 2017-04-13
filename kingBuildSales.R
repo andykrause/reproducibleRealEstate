@@ -79,23 +79,22 @@ kngSCleanSales <- function(saleYears = c(1997, 2014),      # Sales years to use
                            verbose=FALSE                   # Give progress
                            ){
   
-  # libraries
   require(RODBC)
   require(RSQLite)
   require(stringr)
   
-  # read in Sales File
-  if(verbose) cat('Reading in raw sales\n')
+  if (verbose > 0) message('Reading in raw sales')
+
   salesConn <- dbConnect('SQLite', salesDB)
   rawSales <- dbReadTable(salesConn, 'AllSales')
   
-  # base clean
-  if(verbose) cat('Removing sales with missing PIN or Price\n')
+  if (verbose > 0) message('Removing sales with missing PIN or Price')
+
   cleanSales <- rawSales[rawSales$Major > 0, ]
   cleanSales <- cleanSales[cleanSales$SalePrice > 0, ]
   
-  # build sales data
-  if(verbose) cat('Building sales date\n')
+  if (verbose > 0) message('Building sales date')
+
   cleanSales$docDate <- paste(substr(cleanSales$DocumentDate, 4, 5)
                               ,substr(cleanSales$DocumentDate, 1, 2),
                               substr(cleanSales$DocumentDate, 7, 10), sep="")
@@ -103,31 +102,30 @@ kngSCleanSales <- function(saleYears = c(1997, 2014),      # Sales years to use
   cleanSales$salesYear <- as.numeric(format(cleanSales$salesDate, "%Y"))
   cleanSales <- cleanSales[!is.na(cleanSales$salesDate), ]
   
-  # eliminate Transactions prior to Sales Year Limit
-  if(verbose) cat('Limiting to selected time frame\n')
+  if (verbose > 0) message('Limiting to selected time frame')
+
   if(length(saleYears) == 1) saleYears <- c(saleYears, saleYears)
   cleanSales <- cleanSales[cleanSales$salesYear >= saleYears[1] & 
                              cleanSales$salesYear <= saleYears[2], ]
   
-  # add PINX (Parcel Identification Number)
-  if(verbose) cat('Adding PINx\n')
+  if (verbose > 0) message('Adding PINx (parcel identification number)')
+
   cleanSales <- kngBuildPinx(cleanSales)
   
-  # add transaction count and limit by paramter
-  if(verbose) cat('Adding Trans count\n')
+  if (verbose > 0) message('Adding transaction count limited by parameters')
+
   cleanSales <- kngSBuildTransCount(cleanSales, transLimit=transLimit)
   
-  # add MultiParcel sale designation
-  if(verbose) cat('Labeling Multiple parcel sales\n')
+  if (verbose > 0) message('Labeling Multiple parcel sales')
+
   cleanSales <- idDup(cleanSales, 'ExciseTaxNbr', newField = 'multiParcel',
                       iddType='labelNonUnique', binNonUq=TRUE)
   
-  # Add unique IDs
-  if(verbose) cat('Adding Unique IDs\n')
+  if (verbose > 0) message('Adding Unique IDs')
+
   trimSales <- kngSBuildSaleUIDs(cleanSales)
   
-  # Trim sales by Insturment, reason and warning
-  if(verbose) cat('Removing bad Reasons Instruments and Warnings\n')
+  if (verbose > 0) message('Removing bad Reasons Instruments and Warnings')
   
   # Fix the "Warning" Field.  Add a leading/trailing space for the grep()
   trimSales$SaleWarning <- paste(" ", trimSales$SaleWarning, " ", sep="")
@@ -137,17 +135,16 @@ kngSCleanSales <- function(saleYears = c(1997, 2014),      # Sales years to use
                              trimList = unlist(trimList[tL]))
   }
   
-  # Write out
-  if(verbose) cat('Writing out data \n')
+  if (verbose > 0) message('Writing out data')
+
   tExists <- dbExistsTable(salesConn, 'trimmedSales')
   
   if(overWrite & tExists) {
     dbRemoveTable(salesConn, 'trimmedSales')
-    if(verbose) cat(paste0('    Removing existing table: trimmedSales\n'))
+    if (verbose > 0) message('    Removing existing table: trimmedSales'))
   }
   dbWriteTable(salesConn, 'trimmedSales', trimSales, row.names=FALSE)
   
-  # Close
   dbDisconnect(salesConn)
 }
 
@@ -160,10 +157,10 @@ kngSReadData <- function(dataYear,                         # Current year
   # Connect to database
   dbName <- paste0('d:/data/wa/king/assessor/king', dataYear, '.db')
   dyConn <- dbConnect('SQLite', dbname=dbName)
-  if(verbose) cat ('\n Connecting to ', dbName, '\n')
+  if (verbose > 0) message ('Connecting to ', dbName)
   
   # Parcel Data    
-  if(verbose) cat ('\n Reading in Parcel', dataYear, ' data \n')
+  if (verbose > 0) message ('Reading in Parcel', dataYear, ' data')
   assign(paste0("parcel", dataYear), 
          kngBuildPinx(dbGetQuery(dyConn, 
                                  paste0('SELECT Major, Minor, PresentUse FROM ',
@@ -171,7 +168,7 @@ kngSReadData <- function(dataYear,                         # Current year
          envir=.GlobalEnv)
   
   # Resbldg Data
-  if(verbose) cat ('\n Reading in ResBldg', dataYear, ' data \n')
+  if (verbose > 0) message ('Reading in ResBldg', dataYear, ' data')
   assign(paste0("resbldg", dataYear), 
          kngBuildPinx(dbGetQuery(dyConn, 
                                  paste0('SELECT Major, Minor, BldgNbr FROM ',
@@ -251,13 +248,13 @@ kngSLabelSales <- function(saleYears=1999:2014,             # Sale years to use
   oldYears <- NULL
   
   # Read in sales Data
-  if(verbose) cat('Reading in sales data \n')
+  if (verbose > 0) message('Reading in sales data')
   salesConn <- dbConnect('SQLite', salesDB)
   pSales <- dbReadTable(salesConn, 'trimmedSales')
   dbDisconnect(salesConn)
   
   # Read in Characteristics Data
-  if(verbose) cat(paste0('Working on sales in ', iYears, ' \n'))
+  if (verbose > 0) message('Working on sales in ', iYears, ''))
   kngSReadData(saleYears, verbose=verbose)
 
   # Add Present Uses
@@ -273,13 +270,13 @@ kngSLabelSales <- function(saleYears=1999:2014,             # Sale years to use
   labeledSales <- ySales[ySales$R0 == 1, ]
   
   # Write out
-  if(verbose) cat('Writing out data \n')
+  if (verbose > 0) message('Writing out data')
   salesConn <- dbConnect('SQLite', salesDB)
   tExists <- dbExistsTable(salesConn, 'labeledSales')
   
   if(overWrite & tExists) {
     dbRemoveTable(salesConn, 'labeledSales')
-    if(verbose) cat(paste0('    Removing existing table: labeledSales\n'))
+    if (verbose > 0) message('    Removing existing table: labeledSales'))
   }
   dbWriteTable(salesConn, 'labeledSales', labeledSales, row.names=FALSE)
   
@@ -309,12 +306,12 @@ kngSConfirmLabels <- function(salesDB='d:/data/wa/king/assessor/kingsales.db',
   
   ## Read in sales data
   
-  if(verbose) cat('Reading in sales data \n')
+  if (verbose > 0) message('Reading in sales data')
   salesConn <- dbConnect('SQLite', salesDB)
   lSales <- dbReadTable(salesConn, 'labeledSales')
   
   ## Initial labeling
-  if(verbose) cat('Initial labeling of Sales \n')
+  if (verbose > 0) message('Initial labeling of Sales')
   
   # Split by multiparcel-ness
   nmSales <- lSales[lSales$multiParcel == 0, ]
@@ -331,13 +328,13 @@ kngSConfirmLabels <- function(salesDB='d:/data/wa/king/assessor/kingsales.db',
   
   ## Write out
   
-  if(verbose) cat('Writing out data \n')
+  if (verbose > 0) message('Writing out data')
   salesConn <- dbConnect('SQLite', salesDB)
   tExists <- dbExistsTable(salesConn, 'recTypeSales')
   
   if(overWrite & tExists) {
     dbRemoveTable(salesConn, 'recTypeSales')
-    if(verbose) cat(paste0('    Removing existing table: recTypeSales\n'))
+    if (verbose > 0) message('    Removing existing table: recTypeSales'))
   }
   dbWriteTable(salesConn, 'recTypeSales', allSales, row.names=FALSE)
   
@@ -366,9 +363,8 @@ kngSSplitAttachSales <- function(salesDB='d:/data/wa/king/assessor/kingsales.db'
   require(RSQLite)
   require(plyr)
   
-  ## Read in sales data
-  
-  if(verbose) cat('Reading in sales data \n')
+  if (verbose > 0) message('Reading in sales data')
+
   salesConn <- dbConnect('SQLite', salesDB)
   ySales <- dbReadTable(salesConn, 'recTypeSales')
   yData <- names(table(ySales$salesYear))
@@ -377,8 +373,7 @@ kngSSplitAttachSales <- function(salesDB='d:/data/wa/king/assessor/kingsales.db'
   
   rSalesList <- list()
   
-  ## Attach Data
-  if(verbose) cat('Attaching data for ', yData, ' \n')
+  if (verbose > 0) message('Attaching data for ', yData)
     
    # Adding parcel data
   yConn <- dbConnect('SQLite', 
@@ -396,15 +391,14 @@ kngSSplitAttachSales <- function(salesDB='d:/data/wa/king/assessor/kingsales.db'
   # Add Use specific data
   resSales <- kngSAttachKingData(ySales, "R", yData)  
   
-  ## Write out
+  if (verbose > 0) message('Writing out data')
   
-  if(verbose) cat('Writing out data \n')
   salesConn <- dbConnect('SQLite', salesDB)
   tExists <- dbExistsTable(salesConn, 'ResSales')
   
   if(overWrite & tExists) {
     dbRemoveTable(salesConn, 'ResSales')
-    if(verbose) cat(paste0('    Removing existing table: ResSales \n'))
+    if (verbose > 0) message('    Removing existing table: ResSales')
   }
   
   dbWriteTable(salesConn, 'ResSales', resSales, row.names=FALSE)
@@ -458,30 +452,26 @@ kngSAttachAssdValues <- function(salesDB,
                                  verbose=FALSE,
                                  overWrite=TRUE){
   
-  ## Load in Sales
+  if (verbose > 0) message('Reading in sales data')
   
-  if(verbose) cat('Reading in sales data \n')
   salesConn <- dbConnect('SQLite', salesDB)
   lSales <- dbReadTable(salesConn, 'ResSales')
   dbDisconnect(salesConn)
   
-  ## Load in Value History
+  if (verbose > 0) message('Reading in assessed values')
   
-  if(verbose) cat('Reading in assessed values \n')
   assdValConn <- dbConnect('SQLite', file.path(dataDir, 'KingValueHistory.db'))
   assdValues <- dbReadTable(assdValConn, paste0('valuehist', dataYear))
   dbDisconnect(salesConn)
   
-  ## Add Assessed Values
+  if (verbose > 0) message('Add Assessed Values')
   
   lSales$LandVal <- assdValues$LandVal[match(lSales$pinx, assdValues$pinx)]
   lSales$ImpsVal <- assdValues$ImpsVal[match(lSales$pinx, assdValues$pinx)]
   
-  ## Remove sales with no values
+  if (verbose > 0) message('Remove sales with no values')
   
   lSales <- lSales[!is.na(lSales$LandVal), ]
-  
-  ## Return values
   
   return(lSales)
 }  
@@ -492,21 +482,18 @@ kngSAttachXYs <- function(sales,
                           latlongFile,
                           verbose=FALSE){
   
-  ## Read in data
+  if (verbose > 0) message('Reading in XY data')
   
-  if(verbose) cat('Reading in XY data \n') 
   xys <- readShapePoints(latlongFile)    
   
-  ## Add XY data
+  if (verbose > 0) message('Add XY data')
   
   sales$X <- xys$X[match(sales$pinx, xys$pinx)]
   sales$Y <- xys$Y[match(sales$pinx, xys$pinx)]
   
-  ## Remove sales with no values
+  if (verbose > 0) message('Remove sales with no values')
   
   sales <- sales[!is.na(sales$X), ]
-  
-  ## Return values
   
   return(sales)
 }

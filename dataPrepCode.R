@@ -35,12 +35,15 @@
   # What year of sales are you working with (Leave at 2014 for now)
   studyYear <- 2014
 
+  # Adjust verbosity of output (increase value for more output)
+  verbosity <- 1
+
 
 ### Converting data from .csv to .db -----------------------------------------------------
 
   if(convertData){
   
- ## Convert Assessor's Characteristic Data
+    if (verbosity) message("Convert Assessor's Characteristic Data")
   
     convertCSVtoSQLite(dataPathCurrent = dataPath,
                        dataPathNew = dataPath,
@@ -50,7 +53,7 @@
                                       paste0('ResBldg', studyYear2014),
                        overWrite=TRUE) 
 
- ## Convert Assessed Value History
+    if (verbosity) message('Convert Assessed Value History')
  
     convertCSVtoSQLite(dataPathCurrent=dataPath,
                        dataPathNew = dataPath,
@@ -59,14 +62,14 @@
                        tableNames = c('ValueHistory'),
                        overWrite=TRUE)
 
- ##  Isolate the study year Assessed Value File 
+    if (verbosity) message('Isolate the study year Assessed Value File')
  
     kngBuildAssdVal(avYears=studyYear+1,  
                     assdValDB = file.path(dataPath, 'kingvaluehistory.db'),
                     overWrite=TRUE)
 
 
- ## Convert Sales File
+    if (verbosity) message('Convert Sales File')
 
     convertCSVtoSQLite(dataPathCurrent=dataPath,
                        dataPathNew = dataPath,
@@ -91,7 +94,7 @@
                                                          50:53, 59, 61, 63, 64, 66),
                                                   " ")),
                  overWrite=TRUE,
-                 verbose=FALSE 
+                 verbose=verbosity - 1
   )
 
  ## Add Use category and limit to residential only sales
@@ -99,20 +102,20 @@
   kngSLabelSales(saleYears=studyYear, 
                  salesDB=file.path(dataPath, 'kingsales.db'),
                  overWrite=TRUE,
-                 verbose=FALSE)
+                 verbose=verbosity - 1)
 
  ## Remove multiple parcel sales
 
   kngSConfirmLabels(salesDB=file.path(dataPath, 'kingsales.db'),
                     latestYear=studyYear,
-                    verbose=TRUE,
+                    verbose=verbosity,
                     overWrite=TRUE)
 
  ## Add Parcel and Residential Building Information to the sales
 
   kngSSplitAttachSales(salesDB=file.path(dataPath, 'kingsales.db'),
                        dataDir=dataPath,
-                       verbose=TRUE,
+                       verbose=verbosity,
                        overWrite=TRUE)
 
  ## Add Assessed Values
@@ -120,14 +123,14 @@
   xSales <-  kngSAttachAssdValues(salesDB=file.path(dataPath, 'kingsales.db'),
                                   dataDir=dataPath,
                                   dataYear=studyYear,
-                                  verbose=TRUE,
+                                  verbose=verbosity,
                                   overWrite=TRUE)
 
  ## Add Lat/Long to data
 
   xSales <- kngSAttachXYs(xSales,
                           latlongFile = file.path(dataPath, 'parcelpoints2014.shp'),
-                          verbose=FALSE)
+                          verbose=verbosity - 1)
 
 ### Write out data -----------------------------------------------------------------------
 

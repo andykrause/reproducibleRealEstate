@@ -28,29 +28,32 @@ convertMSAtoSQLite <- function(dataPathCurrent,             # Path to Access Fil
   ## Show error if file names are not same length
   
   if(length(fileList) != length(newFileNames)){
-    cat('ERROR: File names not same length')
-    return('File names not the same length')
+    stop('File names not same length')
   }  
   
   ## Set up connections, read and write files
   
   for(fL in 1:length(fileList)){
-    if(verbose) cat(paste0('Converting file number: ', fL, ' of ', 
-                           length(fileList), '\n'))
+    if (verbose > 0)
+      message('Converting file number: ', fL, ' of ', length(fileList))
     
     # Set up connections
     
     msaConn <- odbcConnectAccess2007(paste0(dataPathCurrent, '/', 
                                             fileList[fL]))
-    if(verbose) cat("  Converting from MS Access file: ",
-                    paste0(dataPathCurrent, '/', fileList[fL], '\n'))
+
+    if (verbose > 0) message("  Converting from MS Access file: ",
+                    file.path(dataPathCurrent, fileList[fL]))
     
     slConn <- dbConnect('SQLite', 
                         dbname=paste0(dataPathNew, '/', 
                                       gsub('.accdb', '.db', newFileNames[fL])))
-    if(verbose) cat("  Converting to SQLite file: ",
-                    paste0(dataPathNew, '/', 
-                           gsub('.accdb', '.db', newFileNames[fL]), '\n'))
+                        dbname=file.path(dataPathNew,
+                               gsub('.accdb', '.db', newFileNames[fL])))
+
+    if (verbose > 0) message("  Converting to SQLite file: ",
+                    file.path(dataPathNew,
+                    gsub('.accdb', '.db', newFileNames[fL])))
     
     # Read in Tables
     msaTables <- sqlTables(msaConn)
@@ -66,13 +69,14 @@ convertMSAtoSQLite <- function(dataPathCurrent,             # Path to Access Fil
       
       if(overWrite & tExists) {
         dbRemoveTable(slConn, msaTables$TABLE_NAME[tL])
-        if(verbose) cat(paste0("    Removing existing table: ",
-                                   msaTables$TABLE_NAME[tL], '\n'))
+
+        if (verbose > 0) message("    Removing existing table: ",
+                                   msaTables$TABLE_NAME[tL])
       }
       dbWriteTable(slConn, msaTables$TABLE_NAME[tL], xTable, 
                    row.names=writeRowNames)
-      if(verbose) cat(paste0("    Writing table: ", msaTables$TABLE_NAME[tL],
-                             '\n'))
+
+      if (verbose > 0) message("    Writing table: ", msaTables$TABLE_NAME[tL])
     }
     
     # Close
@@ -116,22 +120,22 @@ convertCSVtoSQLite <- function(dataPathCurrent,             # Path to .csv files
   ## Check for proper length in file name lists
   
   if(length(fileList) != length(tableNames)){
-    cat('ERROR: File names and table names not same length')
-    return('File and table names not the same length')
+    stop('File names and table names not same length')
   }
 
   ## Set up connections
 
   slConn <- dbConnect('SQLite', 
                       dbname=paste0(dataPathNew, '/', newFileName))
-  if(verbose) cat("  Converting to SQLite file: ",
-                  paste0(dataPathNew, '/', newFileName), '\n')
+
+  if (verbose > 0) message("  Converting to SQLite file: ",
+                  file.path(dataPathNew, newFileName))
   
   ## Read in and convert each file
   
   for(fL in 1:length(fileList)){
-    if(verbose) cat(paste0('Converting file number: ', fL, ' of ', 
-                           length(fileList), '\n'))
+    if (verbose > 0) message('Converting file number: ', fL, ' of ',
+                           length(fileList))
     
     # Read in Tables
     xTable <- read.csv(paste0(dataPathCurrent, '/', fileList[fL]))
@@ -142,15 +146,15 @@ convertCSVtoSQLite <- function(dataPathCurrent,             # Path to .csv files
     # Overwrite if exists
     if(overWrite & tExists) {
         dbRemoveTable(slConn, tableNames[fL])
-        if(verbose) cat(paste0("    Removing existing table: ",
-                               tableNames[fL], '\n'))
+
+        if (verbose > 0) message("    Removing existing table: ", tableNames[fL])
     }
     
     # Write if doesn't exist
     dbWriteTable(slConn, tableNames[fL], xTable, 
                    row.names=writeRowNames)
-    if(verbose) cat(paste0("    Writing table: ", tableNames[fL],
-                             '\n'))
+
+    if (verbose > 0) message("    Writing table: ", tableNames[fL])
   }
     
   # Close

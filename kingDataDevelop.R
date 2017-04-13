@@ -9,7 +9,7 @@ kngBuildAssdVal <- function(avYears,            # Years to use
   
   ## Set up connection to data
   
-  if(verbose) cat('Reading in raw data \n')
+  if (verbose > 0) message('Reading in raw data')
   assValConn <- dbConnect('SQLite', assdValDB)
   avData <- dbGetQuery(assValConn, 
                        paste0('SELECT Major, Minor, TaxYr, ApprLandVal AS LandVal, ',
@@ -18,7 +18,7 @@ kngBuildAssdVal <- function(avYears,            # Years to use
                               avYears[length(avYears)], ' AND Reason = "REVALUE"'))
   
   # Write out
-  if(verbose) cat('Writing out data \n')
+  if (verbose > 0) message('Writing out data')
   
   # Loop throug the years
   for(avY in avYears){
@@ -28,11 +28,11 @@ kngBuildAssdVal <- function(avYears,            # Years to use
    
     if(overWrite & tExists) {
       dbRemoveTable(assValConn, avName)
-      if(verbose) cat(paste0('    Removing existing table: ', avName, '\n'))
+      if (verbose > 0) message('    Removing existing table: ', avName)
     }
     dbWriteTable(assValConn, avName, kngBuildPinx(avData[avData$TaxYr == avY, ])
                                                   , row.names=FALSE)
-    if(verbose) cat('Writing out ', avName, '\n')
+    if (verbose > 0) message('Writing out ', avName)
     
   }
   
