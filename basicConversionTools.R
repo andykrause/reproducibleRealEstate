@@ -40,17 +40,16 @@ convertMSAtoSQLite <- function(dataPathCurrent,             # Path to Access Fil
     
     # Set up connections
     
-    msaConn <- odbcConnectAccess2007(paste0(dataPathCurrent, '/', 
-                                            fileList[fL]))
+    msaConn <- odbcConnectAccess2007(file.path(dataPathCurrent, fileList[fL]))
     if(verbose) cat("  Converting from MS Access file: ",
-                    paste0(dataPathCurrent, '/', fileList[fL], '\n'))
+                    file.path(dataPathCurrent, fileList[fL]), '\n')
     
     slConn <- dbConnect('SQLite', 
-                        dbname=paste0(dataPathNew, '/', 
-                                      gsub('.accdb', '.db', newFileNames[fL])))
+                        dbname=file.path(dataPathNew,
+                               gsub('.accdb', '.db', newFileNames[fL])))
     if(verbose) cat("  Converting to SQLite file: ",
-                    paste0(dataPathNew, '/', 
-                           gsub('.accdb', '.db', newFileNames[fL]), '\n'))
+                    file.path(dataPathNew,
+                              gsub('.accdb', '.db', newFileNames[fL]), '\n'))
     
     # Read in Tables
     msaTables <- sqlTables(msaConn)
@@ -123,9 +122,9 @@ convertCSVtoSQLite <- function(dataPathCurrent,             # Path to .csv files
   ## Set up connections
 
   slConn <- dbConnect('SQLite', 
-                      dbname=paste0(dataPathNew, '/', newFileName))
+                      dbname=file.path(dataPathNew, newFileName))
   if(verbose) cat("  Converting to SQLite file: ",
-                  paste0(dataPathNew, '/', newFileName), '\n')
+                  file.path(dataPathNew, newFileName), '\n')
   
   ## Read in and convert each file
   
@@ -134,7 +133,7 @@ convertCSVtoSQLite <- function(dataPathCurrent,             # Path to .csv files
                            length(fileList), '\n'))
     
     # Read in Tables
-    xTable <- read.csv(paste0(dataPathCurrent, '/', fileList[fL]))
+    xTable <- read.csv(file.path(dataPathCurrent, fileList[fL]))
       
     # Check to see if it exists
     tExists <- dbExistsTable(slConn, tableNames[fL])

@@ -65,7 +65,7 @@ kngSBuildSaleUIDs <- function(xSales                       # Sales dataframes
 
 kngSCleanSales <- function(saleYears = c(1997, 2014),      # Sales years to use
                            transLimit = 10,                # Max number of sales per prop
-                           salesDB = 'd:/data/wa/king/assessor/kingsales.db',
+                           salesDB = 'd:/data/wa/king/assessor/KingSales.db',
                            trimList=list(SaleReason=2:19,  
                                         SaleInstrument=c(0, 1, 4:28),
                                         SaleWarning=paste0(" ", c(1:2, 5:9, 11:14,
@@ -158,7 +158,7 @@ kngSReadData <- function(dataYear,                         # Current year
                          ){
   
   # Connect to database
-  dbName <- paste0('d:/data/wa/king/assessor/king', dataYear, '.db')
+  dbName <- paste0('d:/data/wa/king/assessor/KingData', dataYear, '.db')
   dyConn <- dbConnect('SQLite', dbname=dbName)
   if(verbose) cat ('\n Connecting to ', dbName, '\n')
   
@@ -239,7 +239,7 @@ kngSLabelRecordType <- function(ySales,                     # Set of yearly sale
 ### Function that applies labels to king sales -------------------------------------------
 
 kngSLabelSales <- function(saleYears=1999:2014,             # Sale years to use
-                           salesDB='d:/data/wa/king/assessor/kingsales.db',
+                           salesDB='d:/data/wa/king/assessor/KingSales.db',
                            overWrite=TRUE,                  # Should overwrite? 
                            verbose=FALSE                    # See progress?
                            ){
@@ -297,7 +297,7 @@ kngSLabelSales <- function(saleYears=1999:2014,             # Sale years to use
 
 ### Function that confirms King county sale labels ---------------------------------------
 
-kngSConfirmLabels <- function(salesDB='d:/data/wa/king/assessor/kingsales.db',
+kngSConfirmLabels <- function(salesDB='d:/data/wa/king/assessor/KingSales.db',
                               latestYear=2014,              # Last year in data
                               verbose=FALSE,                # Show progress
                               overWrite=TRUE                # Overwrite?
@@ -357,7 +357,7 @@ kngSConfirmLabels <- function(salesDB='d:/data/wa/king/assessor/kingsales.db',
 
 ### Function that splits sales and adds data to them -------------------------------------
 
-kngSSplitAttachSales <- function(salesDB='d:/data/wa/king/assessor/kingsales.db',
+kngSSplitAttachSales <- function(salesDB='d:/data/wa/king/assessor/KingSales.db',
                                  dataDir='d:/data/wa/king/assessor',
                                  verbose=FALSE,
                                  overWrite=TRUE){
@@ -382,7 +382,7 @@ kngSSplitAttachSales <- function(salesDB='d:/data/wa/king/assessor/kingsales.db'
     
    # Adding parcel data
   yConn <- dbConnect('SQLite', 
-                     paste0(dataDir, '/kingData', yData, '.db'))
+                     file.path(dataDir, paste0('KingData', yData, '.db')))
   xParc <- dbReadTable(yConn, paste0('Parcel', yData))
   dbDisconnect(yConn)  
   xParc <- kngBuildPinx(xParc)
@@ -428,7 +428,7 @@ kngSAttachKingData <- function(xSales,                        # Sales data frame
                                ){
   
   # Set data location
-  yConn <- dbConnect('SQLite', paste0(dataDir, '/king', dataYear, '.db'))
+  yConn <- dbConnect('SQLite', file.path(dataDir, paste0('KingData', dataYear, '.db')))
   
   # Load Resbldg data
   if(recType == 'R'){
@@ -469,7 +469,7 @@ kngSAttachAssdValues <- function(salesDB,
   
   if(verbose) cat('Reading in assessed values \n')
   assdValConn <- dbConnect('SQLite', file.path(dataDir, 'KingValueHistory.db'))
-  assdValues <- dbReadTable(assdValConn, paste0('valuehist', dataYear))
+  assdValues <- dbReadTable(assdValConn, paste0('ValueHist', dataYear))
   dbDisconnect(salesConn)
   
   ## Add Assessed Values

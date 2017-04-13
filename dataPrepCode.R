@@ -44,10 +44,10 @@
   
     convertCSVtoSQLite(dataPathCurrent = dataPath,
                        dataPathNew = dataPath,
-                       newFileName = 'KingData2014.db',
-                       fileNames=c('Extr_Parcel.csv', 'Extr_ResBldg.csv'),
+                       newFileName = paste0('KingData', studyYear, '.db'),
+                       fileNames=c('EXTR_Parcel.csv', 'EXTR_ResBldg.csv'),
                        tableNames = c(paste0('Parcel', studyYear),
-                                      paste0('ResBldg', studyYear2014),
+                                      paste0('ResBldg', studyYear)),
                        overWrite=TRUE) 
 
  ## Convert Assessed Value History
@@ -62,7 +62,7 @@
  ##  Isolate the study year Assessed Value File 
  
     kngBuildAssdVal(avYears=studyYear+1,  
-                    assdValDB = file.path(dataPath, 'kingvaluehistory.db'),
+                    assdValDB = file.path(dataPath, 'KingValueHistory.db'),
                     overWrite=TRUE)
 
 
@@ -83,7 +83,7 @@
  
   kngSCleanSales(saleYears = studyYear, 
                  transLimit = 10,
-                 salesDB = file.path(dataPath, 'kingsales.db'),
+                 salesDB = file.path(dataPath, 'KingSales.db'),
                  trimList=list(SaleReason=2:19,
                                SaleInstrument=c(0, 1, 4:28),
                                SaleWarning=paste0(" ", c(1:2, 5:9, 11:14, 18:23, 25, 27,
@@ -97,27 +97,27 @@
  ## Add Use category and limit to residential only sales
 
   kngSLabelSales(saleYears=studyYear, 
-                 salesDB=file.path(dataPath, 'kingsales.db'),
+                 salesDB=file.path(dataPath, 'KingSales.db'),
                  overWrite=TRUE,
                  verbose=FALSE)
 
  ## Remove multiple parcel sales
 
-  kngSConfirmLabels(salesDB=file.path(dataPath, 'kingsales.db'),
+  kngSConfirmLabels(salesDB=file.path(dataPath, 'KingSales.db'),
                     latestYear=studyYear,
                     verbose=TRUE,
                     overWrite=TRUE)
 
  ## Add Parcel and Residential Building Information to the sales
 
-  kngSSplitAttachSales(salesDB=file.path(dataPath, 'kingsales.db'),
+  kngSSplitAttachSales(salesDB=file.path(dataPath, 'KingSales.db'),
                        dataDir=dataPath,
                        verbose=TRUE,
                        overWrite=TRUE)
 
  ## Add Assessed Values
 
-  xSales <-  kngSAttachAssdValues(salesDB=file.path(dataPath, 'kingsales.db'),
+  xSales <-  kngSAttachAssdValues(salesDB=file.path(dataPath, 'KingSales.db'),
                                   dataDir=dataPath,
                                   dataYear=studyYear,
                                   verbose=TRUE,
@@ -126,7 +126,7 @@
  ## Add Lat/Long to data
 
   xSales <- kngSAttachXYs(xSales,
-                          latlongFile = file.path(dataPath, 'parcelpoints2014.shp'),
+                          latlongFile = file.path(dataPath, paste0('parcelPoints', studyYear, '.shp'),
                           verbose=FALSE)
 
 ### Write out data -----------------------------------------------------------------------
